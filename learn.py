@@ -1,3 +1,5 @@
+import random
+
 import torch, numpy
 from dask.dataframe.dispatch import tolist
 from docutils.nodes import legend, inline
@@ -235,4 +237,157 @@ y = [normal(x, mu, sigma) for mu, sigma in params]
 plot(x, [normal(x, mu, sigma) for mu, sigma in params], xlabel = "x",
      ylabel = 'PDF', figsize = ( 45, 25), legend = [f'mean {mu}, std {sigma}'
                                                      for mu , sigma in params])
+def synthetic_data(w, b, num_examples):
+    X = torch.normal(0, 1, (num_examples, len(w)))
+    y = torch.matmul(X, w) + b
+    y +=torch.normal(0, 0.01, y.shape)
+    return X, y.reshape((-1, 1))
+true_w = torch.tensor([2, -3.4])
+true_b = 4.2
+features, labels = synthetic_data(true_w, true_b, 1000)
 
+plt.scatter(features[:, (1)].detach().numpy(), labels.detach().numpy(), 1)
+plt.show(block = True)
+import random
+def data_iter(batch_size, features, labels):
+    num_examples = len(features)
+    indices = list(range(num_examples))
+    random.shuffle(indices)
+    for i in range(0, num_examples, batch_size):
+        batch_indices = torch.tensor(
+            indices[i : min(i + batch_size, num_examples)])
+        yield features[batch_indices], labels[batch_indices]
+
+batch_size = 10
+for X, y in data_iter(batch_size, features, labels):
+    print(X, '\n', y)
+    break
+w = torch.normal(0, 0.01, size = (2, 1), requires_grad= True)
+b = torch.zeros(1, requires_grad = True)
+
+def linreg(X, w, b):
+    return torch.matmul(X, w) + b
+def squared_loss(y_hat, y):
+    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+def sgd(params, lr, batch_size):
+    with torch.no_grad():
+        for param in params:
+            param -= lr * param.grad / batch_size
+            param.grad.zero_()
+w = torch.normal(0, 0.01, size = (2, 1), requires_grad= True)
+b = torch.zeros(1, requires_grad = True)
+lr = .01
+num_epochs = 10
+net = linreg
+loss = squared_loss
+for epoch in range(num_epochs):
+    for X, y in data_iter(batch_size, features, labels):
+        l = loss(net(X, w, b), y)
+        l.sum().backward()
+        sgd([w, b], lr, batch_size)
+    with torch.no_grad():
+        train_l = loss(net(features, w, b), labels)
+        print(f"epoch {epoch + 1}, loss {float(train_l.mean()): f}")
+true_w - w.detach().reshape(true_w.shape)
+true_b - b.detach()
+import numpy as np
+import torch
+from torch.utils import data
+
+true_w = torch.tensor([2, -3.4])
+true_b = 4.2
+features, labels = synthetic_data(true_w, b, 1000)
+def load_array(data_arrays, batch_size, is_train = True):
+    dataset = data.TensorDataset(*data_arrays)
+    return data.DataLoader(dataset, batch_size, shuffle = is_train)
+batch_size = 10
+data_iter = load_array((features, labels), batch_size)
+
+for X, y in data_iter:
+    print(X)
+    print(y)
+    break
+
+next(iter(data_iter))
+
+from torch import nn
+net = nn.Sequential(nn.Linear(2, 1))
+net[0].weight.data.normal_(0, 0.01)
+net[0].bias.data.fill_(0)
+loss = nn.MSELoss()
+
+trainer = torch.optim.SGD(net.parameters(), lr = 0.03)
+num_epochs = 3
+for epoch in range(num_epochs):
+    for X, y in data_iter:
+        l = loss(net(X), y)
+        trainer.zero_grad()
+        l.backward()
+        trainer.step()
+    with torch.no_grad():
+        l = loss(net(features), labels)
+        print(f"epoch {epoch + 1}, loss {l : f}")
+   w = net[0].weight.data
+   true_w - w.reshape(true_w.shape)
+   b = net[0].bias.data
+   true_b - b
+
+import torch
+import torchvision
+from torch.utils import data
+from torchvision import transforms
+use_svg_display()
+trans = transforms.ToTensor()
+mnist_train = torchvision.datasets.FashionMNIST(
+    root = "../data", train = True, transform = trans, download = True)
+mnist_test = torchvision.datasets.FashionMNIST(
+    root = "../data", train = False, transform = trans, download = True
+)
+
+len(mnist_train), len(mnist_test)
+mnist_train[0][0].shape
+
+def get_fashion_mnist_labels(labels):
+    text_labels = ["t-shirt", "trouser", "pullover", "dress", "coat", "sandal",
+                   "shirt", "sneaker", "bag", "ankle boot"]
+    return [text_labels[int(i)] for i in labels]
+labels = range(1, 10)
+get_fashion_mnist_labels(labels)
+
+def show_images(imgs, num_rows, num_cols, titles = None, scale = 1.5):
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = plt.subplots(num_rows, num_cols, figsize = figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        if torch.is_tensor(img):
+            ax.imshow(img.numpy())
+        else:
+            ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if(titles):
+            ax.set_title(titles[i])
+    plt.show(block = True)
+    return(axes)
+X, y = next(iter(data.DataLoader(mnist_train, batch_size = 18)))
+show_images(X.reshape(18, 28, 28), 2, 9,
+            titles = get_fashion_mnist_labels(y))
+a = ("John", "Charles", "Mike")
+b = ("Jenny", "Christy", "Monica")
+
+x = zip(a, b)
+class MyNumbers:
+    def __iter__(self):
+        self.a = 1
+        return self
+    def __next__(self):
+        if self.a <= 20:
+            x = self.a
+            self.a += 1
+            return x
+        else:
+            raise StopIteration
+myclass = MyNumbers()
+myiter = iter(myclass)
+for x in myiter:
+    print(x)
