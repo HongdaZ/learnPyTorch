@@ -1,4 +1,109 @@
+import sys
+print(sys.version)
+print("hello, world!")
 import random
+if 5 > 2:
+    print("Five is greater than two!")
+x = 5
+y = "hello, world!"
+# This is a comment
+"""
+This is a comment writen in multiple lines
+"""
+x = str(3)
+y = int(3)
+z = float(3)
+print(type(x))
+
+fruits = ("apple", "banana", "cherry")
+x, y, z = fruits
+
+x, y, z = "orange", "banana", "cherry"
+x = y = z = "orange"
+y = str(1)
+x = "Python is awesome"
+print(x)
+print(x + y + z)
+print(x, y, z)
+x = "awesome"
+def myfunc():
+    global x
+    x = "hello"
+    print("Python is " + x)
+myfunc()
+type(x)
+x = bool(5)
+x = bytes(5)
+x = float(1)
+x + 1e-32
+y = 1e-32
+x += y
+y = 3.6
+int(y)
+import random
+print(random.randrange(1, 10))
+for x in z:
+    print(x)
+a = "hello, world!"
+print(a[1])
+for i in range(0, 5):
+    print(a[i])
+print(a[2 : 5])
+print(a[-5 : -2])
+price = 25
+txt = f"The price is {price : .2f} dollars"
+print(txt)
+x = 200
+print(isinstance(x, int))
+y = x
+x is y
+x
+y = 3
+x is y
+x = [1, 3, 4]
+y = x
+y is x
+y[2] = 1
+y is x
+y = x.copy()
+
+thislist = ["apple", "banana", "cherry", "orange",
+            "kiwi", "melon", "mango"]
+print(thislist[-4 : -1])
+
+a = ("a", "b", "c", "d", "e", "f", "g", "h")
+x = slice(3, 5)
+print(a[x])
+thislist = ["apple", "banana", "cherry"]
+thislist[1:2] = ["blackcurrant", "watermelon"]
+print(thislist)
+
+thislist = ["apple", "banana", "cherry"]
+thislist[1:3] = ["watermelon"]
+print(thislist)
+thislist = ["apple", "banana", "cherry"]
+thislist.insert(2, "watermelon")
+print(thislist)
+tropical = ["mango", "pineapple", "papaya"]
+thislist.extend(tropical)
+thislist.remove("banana")
+thislist.pop(2)
+del thislist[0]
+del thislist
+thislist = ["apple", "banana", "cherry"]
+thislist.clear()
+thislist = ["apple", "banana", "cherry"]
+newlist = [x.upper() for x in thislist if "a" in x]
+newlist.sort(reverse = True)
+def myFunc(n):
+    return abs(n - 50)
+thislist = [100, 50, 65, 82, 23]
+thislist.sort(key = myFunc)
+mylist = thislist.copy()
+mylist = list(("hello", "world"))
+newlist = mylist[:]
+clist = mylist + newlist
+clist.extend(clist)
 
 import torch, numpy
 from dask.dataframe.dispatch import tolist
@@ -327,6 +432,7 @@ for epoch in range(num_epochs):
     with torch.no_grad():
         l = loss(net(features), labels)
         print(f"epoch {epoch + 1}, loss {l : f}")
+
    w = net[0].weight.data
    true_w - w.reshape(true_w.shape)
    b = net[0].bias.data
@@ -339,9 +445,9 @@ from torchvision import transforms
 use_svg_display()
 trans = transforms.ToTensor()
 mnist_train = torchvision.datasets.FashionMNIST(
-    root = "../data", train = True, transform = trans, download = True)
+    root = ".data", train = True, transform = trans, download = True)
 mnist_test = torchvision.datasets.FashionMNIST(
-    root = "../data", train = False, transform = trans, download = True
+    root = "data", train = False, transform = trans, download = True
 )
 
 len(mnist_train), len(mnist_test)
