@@ -2,6 +2,7 @@ import sys
 print(sys.version)
 print("hello, world!")
 import random
+random.randint(1, 10)
 if 5 > 2:
     print("Five is greater than two!")
 x = 5
@@ -49,7 +50,7 @@ print(a[1])
 for i in range(0, 5):
     print(a[i])
 print(a[2 : 5])
-print(a[-5 : -2])
+print(a[-5 : -1])
 price = 25
 txt = f"The price is {price : .2f} dollars"
 print(txt)
@@ -66,7 +67,7 @@ y is x
 y[2] = 1
 y is x
 y = x.copy()
-
+y is x
 thislist = ["apple", "banana", "cherry", "orange",
             "kiwi", "melon", "mango"]
 print(thislist[-4 : -1])
@@ -74,6 +75,7 @@ print(thislist[-4 : -1])
 a = ("a", "b", "c", "d", "e", "f", "g", "h")
 x = slice(3, 5)
 print(a[x])
+print(a[3 : 5])
 thislist = ["apple", "banana", "cherry"]
 thislist[1:2] = ["blackcurrant", "watermelon"]
 print(thislist)
@@ -105,6 +107,673 @@ newlist = mylist[:]
 clist = mylist + newlist
 clist.extend(clist)
 
+thistuple = ("apple", "banana", "cherry", "apple", "cherry")
+print(thistuple)
+type(thistuple)
+thistuple = ("apple", "banana", "cherry")
+print(thistuple[1])
+thistuple = ("apple", "banana", "cherry", "orange",
+             "kiwi", "melon", "mango")
+print(thistuple[: 4])
+
+x = ("apple", 'banana', "cherry")
+y = list(x)
+y[1] = "kiwi"
+x = tuple(y)
+fruits = ("apple", "banana", "cherry")
+(green, yellow, red) = fruits
+fruits = ("apple", "banana", "cherry", "strawberry", "raspberry")
+(green, yellow, *red) = fruits
+print(green)
+print(yellow)
+print(red)
+(green, *tropic, red) = fruits
+print(green)
+print(tropic)
+print(red)
+
+for i in range(len(thistuple)):
+    print(thistuple[i])
+
+fruits = ("apple", "banana", "cherry")
+mytuple = fruits * 2
+print(mytuple)
+thisset = {"banana", "apple", "cherry", "apple"}
+print(thisset)
+for x in thisset:
+    print(x)
+thisset.add("orange")
+thisset.remove("apple")
+thisset = {"apple", "banana", "cherry"}
+
+x = thisset.pop()
+print(x)
+print(thisset)
+thisset.clear()
+set1 = {"a", "b", "c"}
+set2 = {1, 2, 3}
+set3 = set1.union(set2)
+thisdict = {
+    "brand": "Ford",
+    "model": "Mustang",
+    "year": 1964
+}
+print(thisdict)
+print(thisdict["brand"])
+thisdict = {
+    "brand": "Ford",
+    "model": "Mustang",
+    "year": 1964,
+    "year": 2020
+}
+len(thisdict)
+thisdict["color"] = ["red", "white", "blue"]
+thisdict.keys()
+car = {
+"brand": "Ford",
+"model": "Mustang",
+"year": 1964
+}
+x = car.keys()
+print(x)
+car["color"] = "white"
+print(x)
+id(x)
+id(car)
+x = car.values()
+print(x)
+car["year"] = 2018
+print(x)
+x = car.items()
+if "model" in thisdict:
+    print("model is one of the keys")
+print(car)
+car.pop("model")
+car.clear()
+car
+for x in thisdict:
+    print(x)
+for x in thisdict:
+    print(thisdict[x])
+for x, y in thisdict.items():
+    print(x, y)
+mydict = thisdict.copy()
+child1 = {
+  "name" : "Emil",
+  "year" : 2004
+}
+child2 = {
+  "name" : "Tobias",
+  "year" : 2007
+}
+child3 = {
+  "name" : "Linus",
+  "year" : 2011
+}
+
+myfamily = {
+  "child1" : child1,
+  "child2" : child2,
+  "child3" : child3
+}
+myfamily["child1"]["name"]
+child1["name"] = "bill"
+for x in myfamily.values():
+    for y in x.values():
+        print(y)
+set1 = {"a", "b", "c"}
+set2 = {1, 2, 3}
+
+set3 = set1.union(set2)
+set2.remove(1)
+print(set3)
+
+tuple1 = ("a", "b", "c")
+tuple2 = (1, 2, 3)
+tuple3 = tuple1 + tuple2
+tuple2 = (3, 4, 5)
+a = 330
+b = 350
+print("A") if a > b else print("=") if a == b else print("B")
+i = 1
+while i < 6:
+    print(i)
+    i +=1
+
+i = 1
+while i < 6:
+    print(i)
+    if i == 3:
+        break
+    i += 1
+i = 0
+while i < 6:
+    i += 1
+    if i == 3:
+        continue
+    print(i)
+i = 1
+while i < 6:
+    print(i)
+    i +=1
+else:
+    print(f"i is equal to {i : 2f}\n")
+fruits = ["apple", "banana", "cherry"]
+for x in fruits:
+    print(x)
+
+for x in range(6):
+    print(x)
+adj = ["red", "big", "tasty"]
+fruits = ["apple", "banana", "cherry"]
+for x in adj:
+    for y in fruits:
+        print(x, y)
+def my_function():
+    print("Hello from a function!\n")
+my_function()
+def my_function(**kid):
+    print("His last name is " + kid["lname"])
+my_function(fname = "Tobias", lname = "Refsnes")
+
+def tri_recursion(k):
+  if(k > 0):
+    result = k + tri_recursion(k - 1)
+    print(result)
+  else:
+    result = 0
+  return result
+
+print("Recursion Example Results:")
+tri_recursion(6)
+
+add10 = lambda a : a + 10
+print(add10(5))
+mult = lambda a, b : a * b
+mult(10, 11)
+def mult_n(n):
+    def multn(k):
+        return n * k
+    func = multn
+    return func
+
+mult10 = mult_n(10)
+mult10(13)
+
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    def __str__(self):
+        return f"{self.name}({self.age})"
+    def greeting(self):
+        print("Hello, my name is " + self.name)
+p1 = Person("John", 36)
+print(p1)
+p1.greeting()
+class Person:
+  def __init__(self, fname, lname):
+    self.firstname = fname
+    self.lastname = lname
+
+  def printname(self):
+    print(self.firstname, self.lastname)
+class Student(Person):
+    def __init__(self, fname, lname, student_id):
+        self.id = student_id
+        super().__init__(fname, lname)
+
+student1 = Student("Hongda", "Zhang", "0011")
+fruits = ("apple", "banana", "cherry")
+iter_fruits = iter(fruits)
+next(iter_fruits)
+next(iter_fruits)
+next(iter_fruits)
+
+class MyIter:
+    def __init__(self, n):
+        self.n = n
+    def __iter__(self):
+        self.current = 0
+        return self
+    def __next__(self):
+        if self.current < self.n:
+            current = self.current
+            self.current +=1
+            return current
+        else:
+            raise StopIteration
+n_times = MyIter(10)
+for x in n_times:
+    print(x)
+
+class Vehicle:
+    def __init__(self, brand, model):
+        self.brand = brand
+        self.model = model
+    def move(self):
+        pass
+
+class Car(Vehicle):
+    def __init__(self, brand, model):
+        super().__init__(brand, model)
+    def move(self):
+        print("Move!")
+class Boat(Vehicle):
+    def move(self):
+        print("Sail!")
+
+class Plane(Vehicle):
+    def move(self):
+        print("Fly!")
+car1 = Car("Ford", "Mustang")
+boat1 = Boat("Ibiza", "Turig 20")
+plane1 = Plane("Boeing", "747")
+for x in (car1, boat1, plane1):
+    x.move()
+import platform
+x = dir(platform)
+print(x)
+import datetime
+x = datetime.datetime.now()
+import json
+
+# some JSON:
+x =  '{ "name":"John", "age":30, "city":"New York"}'
+
+# parse x:
+y = json.loads(x)
+
+# the result is a Python dictionary:
+print(y["age"])
+# a Python object (dict):
+x = {
+  "name": "John",
+  "age": 30,
+  "city": "New York"
+}
+
+# convert into JSON:
+y = json.dumps(x)
+
+# the result is a JSON string:
+print(y)
+
+import re
+
+txt = "The rain in Spain"
+x = re.findall("[a]{1}", txt)
+print(x)
+del x
+try:
+    print(x)
+except:
+    print("An exception occured!")
+
+try:
+    print(x)
+except NameError:
+    print("Variable x is not defined!")
+except:
+    print("Something else went wrong!")
+
+try:
+    print("Hello")
+except:
+    print("Something went wrong!")
+else:
+    print("Nothing went wrong!")
+
+#x = -1
+#if x < 0:
+#    raise Exception("Sorry, no numbers below zero")
+
+x = "hello"
+
+#if not type(x) is int:
+#    raise TypeError("Only integers are allowed!")
+username = input("Enter username:")
+print("Username is: " + username)
+price = 59.577574
+txt = f"The price is {price : .2f} dollars!"
+print(txt)
+
+f = open("myfile.txt", "w")
+f.close()
+f = open("myfile.txt", "r")
+print(f.readline())
+f.close()
+
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5])
+print(arr)
+type(arr)
+print(np.__version__)
+import numpy as np
+arr = np.array([1, 2, 3, 4])
+print(arr[0])
+arr = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+print(f"2nd element on 1st row: {arr[0, 1]}")
+arr = np.array([1, 2, 3, 4, 5, 6, 7])
+arr = np.array([1.1, 2.1, 3.1])
+newarr = arr.astype("i")
+x = arr.copy()
+arr[0] = 42
+print(arr)
+print(x)
+x = arr.view()
+arr[0] = 23
+print(arr)
+print(x)
+x = arr.copy()
+y = arr.view()
+x.base
+y.base
+arr = np.array([ range(1, 13) ])
+newarr = arr.reshape(4, 3)
+newarr.base
+
+arr = np.array([[1, 2, 4], [4, 5, 6]])
+for x in arr:
+    print(x)
+    break
+for x in range(0, 2):
+    for y in range(0, 3):
+        print(arr[x, y])
+for x in arr:
+    for y in x:
+        print(y)
+
+arr = np.array([1, 2, 3])
+
+for x in np.nditer(arr, flags=['buffered'], op_dtypes=['S']):
+  print(x)
+arr = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
+
+for x in np.nditer(arr[:, ::2]):
+  print(x)
+arr = np.array([1, 2, 3])
+
+for idx, x in np.ndenumerate(arr):
+  print(idx, x)
+
+
+arr1 = np.array([1, 2, 3])
+
+arr2 = np.array([4, 5, 6])
+
+arr = np.vstack((arr1, arr2))
+
+print(arr)
+
+arr1 = np.array([1, 2, 3])
+
+arr2 = np.array([4, 5, 6])
+
+arr = np.hstack((arr1, arr2))
+
+print(arr)
+arr1 = np.array([[1, 2], [3, 4]])
+
+arr2 = np.array([[5, 6], [7, 8]])
+
+arr = np.concatenate((arr1, arr2), axis=0)
+
+print(arr)
+arr = np.concatenate((arr1, arr2), axis=1)
+
+print(arr)
+
+arr = np.concatenate((arr1, arr2), axis=0)
+
+print(arr)
+
+arr1 = np.array([1, 2, 3])
+
+arr2 = np.array([4, 5, 6])
+
+arr = np.stack((arr1, arr2), axis=1)
+
+print(arr)
+
+import numpy as np
+
+arr1 = np.array([1, 2, 3])
+
+arr2 = np.array([4, 5, 6])
+
+arr = np.hstack((arr1, arr2))
+
+print(arr)
+
+arr = np.vstack((arr1, arr2))
+y = arr[:, 0]
+print(arr)
+
+arr = np.array([1, 2, 3, 4, 5, 6, 4, 4])
+newarr = np.array_split(arr, 3)
+x = np.where(arr == 4)
+x[0][0]
+
+arr = np.array([6, 7, 8, 9])
+
+x = np.searchsorted(arr, 7)
+
+print(x)
+
+arr = np.array([41, 42, 43, 44])
+
+x = [True, False, True, False]
+
+newarr = arr[x]
+
+arr = np.array([1, 2, 3, 4, 5, 6, 7])
+
+newarr = arr[ arr % 2 == 0]
+
+print(newarr)
+
+from numpy import random
+
+x = random.randint(100, size = (2, 5))
+
+from numpy import random
+x = random.choice([3, 5, 7], p = [.1, .3, .6], size = 100)
+
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+
+random.shuffle(arr)
+
+print(arr)
+print(random.permutation(arr))
+import seaborn as sns
+import matplotlib.pyplot as plt
+x = random.normal(loc = 10, scale = 2, size = (1000))
+sns.kdeplot(x)
+plt.show(block = True)
+x = random.binomial(n = 10, p = 0.5, size = 100)
+sns.displot(x)
+plt.show(block = True)
+
+x = [1, 2, 3, 4]
+y = [4, 5, 6, 7]
+z = []
+c = zip(x, y)
+for i, j in zip(x, y):
+    z.append(i + j)
+print(z)
+
+z = np.add(x, y)
+print(z)
+
+def myadd(x, y):
+    return x + y
+myadd = np.frompyfunc(myadd, 2, 1)
+
+print(myadd([1, 2, 3, 4], [5, 6, 7, 8]))
+
+arr1 = np.array([10, 11, 12, 13, 14, 15])
+arr2 = np.array([20, 21, 22, 23, 24, 25])
+
+newarr = np.add(arr1, arr2)
+
+from math import log
+nplog = np.frompyfunc(log, 2, 1)
+print(nplog(100, 15))
+newarr = np.add(arr1, arr2)
+np.sum([arr1, arr2])
+[arr1, arr2]
+arr1 = np.array([1, 2, 3])
+arr2 = np.array([1, 2, 3])
+newarr = np.sum([arr1, arr2], axis = 0)
+np.prod(arr1)
+arr1 = np.array([1, 2, 3, 4])
+arr2 = np.array([5, 6, 7, 8])
+
+newarr = np.prod([arr1, arr2], axis=1)
+
+arr = np.array([3, 6, 9])
+
+x = np.lcm.reduce(arr)
+
+print(x)
+
+import pandas as pd
+
+df = pd.read_csv("data/house_tiny.csv")
+
+mydataset = {
+    'cars' : ["BMW", "Volvo", "Ford"],
+    'passings' : [3, 7, 2]
+}
+
+data = {
+  "calories": [420, 380, 390],
+  "duration": [50, 40, 45]
+}
+
+#load data into a DataFrame object:
+df = pd.DataFrame(data)
+
+data = pd.read_json("data/data.js")
+
+data = {
+  "Duration":{
+    "0":60,
+    "1":60,
+    "2":60,
+    "3":45,
+    "4":45,
+    "5":60
+  },
+  "Pulse":{
+    "0":110,
+    "1":117,
+    "2":103,
+    "3":109,
+    "4":117,
+    "5":102
+  },
+  "Maxpulse":{
+    "0":130,
+    "1":145,
+    "2":135,
+    "3":175,
+    "4":148,
+    "5":127
+  },
+  "Calories":{
+    "0":409,
+    "1":479,
+    "2":340,
+    "3":282,
+    "4":406,
+    "5":300
+  }
+}
+
+df = pd.DataFrame(data)
+df.head(10)
+print(df)
+df.dropna(inplace = True)
+df.fillna(130, inplace = True)
+df["Duration"] = df["Duration"].fillna(130)
+df.index
+df.plot()
+plt.show(block = True)
+
+import matplotlib.pyplot as plt
+xpoints = np.array([0, 6])
+ypoints = np.array([0, 250])
+
+plt.plot(xpoints, ypoints)
+plt.show(block = True)
+
+plt.plot(xpoints, ypoints, "o")
+plt.show(block = True)
+
+xpoints = np.array([1, 2, 6, 8])
+ypoints = np.array([3, 8, 1, 10])
+
+plt.plot(xpoints, ypoints, marker = "X")
+plt.show(block = True)
+
+plt.plot(ypoints, "o:r", ms = 20)
+plt.show(block = True)
+
+plt.plot(ypoints, lw = "20", ls = "dashed", ms = 20)
+plt.show(block = True)
+
+y1 = np.array([3, 8, 1, 10])
+y2 = np.array([6, 2, 7, 11])
+plt.plot(y1)
+plt.plot(y2)
+plt.ylabel("Calorie Burnage")
+plt.show(block = True)
+
+plt.subplot(2, 1, 1)
+plt.plot(y1, y2, "o:g")
+plt.subplot(2, 1, 2)
+plt.plot(y2, y1, "o--r")
+plt.show(block = True)
+
+x = np.array([5,7,8,7,2,17,2,9,4,11,12,9,6])
+y = np.array([99,86,87,88,111,86,103,87,94,78,77,85,86])
+
+plt.scatter(x, y, color = "red")
+plt.show(block = True)
+
+plt.hist(y)
+plt.show(block = True)
+
+np.mean(y)
+np.std(y)
+np.percentile(y, 90)
+x = np.random.uniform(0, 5, 250)
+plt.hist(x, 5)
+plt.show(block = True)
+from numpy import random
+x = random.normal(5, 1, 10000)
+plt.hist(x, 20)
+plt.show(block = True)
+
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = [5,7,8,7,2,17,2,9,4,11,12,9,6]
+y = [99,86,87,88,111,86,103,87,94,78,77,85,86]
+
+slope, intercept, r, p, std_err = stats.linregress(x, y)
+
+def line(x):
+    return slope * x + intercept
+linear_line = list(map(line, x))
+plt.scatter(x, y)
+plt.plot(x, linear_line)
+plt.show(block = True)
+######################################################
 import torch, numpy
 from dask.dataframe.dispatch import tolist
 from docutils.nodes import legend, inline
