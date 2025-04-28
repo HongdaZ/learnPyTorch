@@ -59,3 +59,5 @@ plt.gca().set_ylabel("Estimated probability")
 plt.legend()
 plt.show(block = True)
 
+help(torch.ones)
+torch.ones((3, 4))
