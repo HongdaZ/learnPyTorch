@@ -61,3 +61,58 @@ plt.show(block = True)
 
 help(torch.ones)
 torch.ones((3, 4))
+
+import math
+import time
+import numpy as np
+
+n = 10000
+a = torch.ones(n)
+b = torch.ones(n)
+class Timer:
+    def __init__(self):
+        self.times = []
+        self.start()
+    def start(self):
+        self.tik = time.time()
+    def stop(self):
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+    def avg(self):
+        return sum(self.times) / len(self.times)
+    def sum(self):
+        return sum(self.times)
+    def cumsum(self):
+        return np.array(self.times).cumsum().tolist()
+c = torch.zeros(n)
+timer = Timer()
+for i in range(n):
+    c[i] = a[i] + b[i]
+f'{timer.stop():.5f} sec'
+
+timer.start()
+d = a + b
+f'{timer.stop():.5f} sec'
+
+def normal(x, mu, sigma):
+    p = 1/ math.sqrt(2 * math.pi * sigma ** 2)
+    return p * np.exp(-0.5 / sigma ** 2 * (x - mu) ** 2)
+
+x = np.arange(-7, 7, 0.01)
+params = [(0, 1), (0, 2), (3, 1)]
+for mu, sigma in params:
+    plt.plot(x, normal(x, mu, sigma))
+plt.show(block = True)
+
+def synthetic_data(w, b, num_example):
+    x = torch.normal(0, 1, (num_example, len(w)))
+    y = torch.matmul(x, w) + b
+    y += torch.normal(0, 0.01, y.shape)
+    return x, y.reshape((-1, 1))
+
+true_w = torch.tensor((2, -3.4))
+true_b = 4.2
+features, labels = synthetic_data(true_w, true_b, 1000)
+
+plt.scatter(features[:, 1].detach().numpy(), labels.detach().numpy(), 1)
+plt.show(block = True)
