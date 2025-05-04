@@ -1,3 +1,5 @@
+import random
+
 import torch
 torch.cuda.is_available()
 # autograd
@@ -37,6 +39,9 @@ d.backward()
 a.grad == d / a
 
 from torch.distributions import multinomial
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 
 fair_probs = torch.ones([6]) / 6
@@ -104,6 +109,8 @@ for mu, sigma in params:
     plt.plot(x, normal(x, mu, sigma))
 plt.show(block = True)
 
+import torch
+
 def synthetic_data(w, b, num_example):
     x = torch.normal(0, 1, (num_example, len(w)))
     y = torch.matmul(x, w) + b
@@ -116,3 +123,55 @@ features, labels = synthetic_data(true_w, true_b, 1000)
 
 plt.scatter(features[:, 1].detach().numpy(), labels.detach().numpy(), 1)
 plt.show(block = True)
+
+def data_iter(batch_size, features, labels):
+    num_examples = len(features)
+    indices = list(range(num_examples))
+    random.shuffle(indices)
+    for i in range(0, num_examples, batch_size):
+        batch_indices = torch.tensor(indices[i : min(i + batch_size,
+                                                     num_examples)])
+        yield features[batch_indices], labels[batch_indices]
+
+batch_size = 10
+for x, y in data_iter(batch_size, features, labels):
+    print(x, "\n", y)
+    break
+
+def number_generator(n):
+    i = 0
+    while i < n:
+        yield i
+        i += 1
+my_generator = number_generator(5)
+print(next(my_generator))
+print(next(my_generator))
+
+for num in my_generator:
+    print(num)
+
+def linreg(x, w, b):
+    return torch.matmul(x, w) + b
+def squared_loss(y_hat, y):
+    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+def sgd(params, lr, batch_size):
+    with torch.no_grad():
+        for param in params:
+            param -= lr * param.grad / batch_size
+            param.grad.zero_()
+lr = 0.03
+num_epochs = 30
+net = linreg
+loss = squared_loss
+
+w = torch.tensor([0, 0],dtype= torch.float32, requires_grad = True)
+b = torch.zeros(1, requires_grad = True)
+for epoch in range(num_epochs):
+    for x, y in data_iter(batch_size, features, labels):
+        l = loss(net(x, w, b), y)
+        l.sum().backward()
+        sgd([w, b], lr, batch_size)
+    with torch.no_grad():
+        train_l = loss(net(features, w, b), labels)
+        print(f'epoch{epoch + 1}, loss = { float(train_l.mean()):f}')
+
