@@ -39,10 +39,9 @@ d.backward()
 a.grad == d / a
 
 from torch.distributions import multinomial
-import matplotlib
-matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
+import matplotlib
 
 fair_probs = torch.ones([6]) / 6
 multinomial.Multinomial(1, fair_probs).sample()
@@ -65,7 +64,7 @@ plt.legend()
 plt.show(block = True)
 
 help(torch.ones)
-torch.ones((3, 4))
+torch.ones((3, 4), dtype = torch.float32)
 
 import math
 import time
@@ -106,7 +105,8 @@ def normal(x, mu, sigma):
 x = np.arange(-7, 7, 0.01)
 params = [(0, 1), (0, 2), (3, 1)]
 for mu, sigma in params:
-    plt.plot(x, normal(x, mu, sigma))
+    plt.plot(x, normal(x, mu, sigma), label =("Std = " + f'{sigma: .2f}') )
+plt.legend()
 plt.show(block = True)
 
 import torch
@@ -121,8 +121,8 @@ true_w = torch.tensor((2, -3.4))
 true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 
-plt.scatter(features[:, 1].detach().numpy(), labels.detach().numpy(), 1)
-plt.show(block = True)
+#plt.scatter(features[:, 1].detach().numpy(), labels.detach().numpy(), 1)
+#plt.show(block = True)
 
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
@@ -137,13 +137,18 @@ batch_size = 10
 for x, y in data_iter(batch_size, features, labels):
     print(x, "\n", y)
     break
-
+data_gen = data_iter(batch_size, features, labels)
+iter_data = iter(data_gen)
+next(iter_data)
 def number_generator(n):
     i = 0
     while i < n:
         yield i
         i += 1
 my_generator = number_generator(5)
+
+iter_num = iter(my_generator)
+next(iter_num)
 print(next(my_generator))
 print(next(my_generator))
 
@@ -159,8 +164,21 @@ def sgd(params, lr, batch_size):
         for param in params:
             param -= lr * param.grad / batch_size
             param.grad.zero_()
+
+"""Python's behavior regarding function arguments is best described as 
+"pass by object reference." This mechanism combines aspects of both pass
+ by value and pass by reference, depending on the mutability of the object
+  being passed."""
+def modify_list(my_list):
+    my_list.append(4)  # Modifies the original list
+    my_list = [5, 6, 7] # Reassigns the parameter, does not affect the original
+
+original_list = [1, 2, 3]
+modify_list(original_list)
+print(original_list) # Output: [1, 2, 3, 4]
+
 lr = 0.03
-num_epochs = 30
+num_epochs = 4
 net = linreg
 loss = squared_loss
 
@@ -174,4 +192,18 @@ for epoch in range(num_epochs):
     with torch.no_grad():
         train_l = loss(net(features, w, b), labels)
         print(f'epoch{epoch + 1}, loss = { float(train_l.mean()):f}')
+
+
+import numpy as np
+import torch
+from torch.utils import data
+true_w = torch.tensor([2, -3.4])
+true_b = 4.2
+features, labels = synthetic_data(true_w, true_b, 1000)
+
+def load_array(data_arrays, batch_size, is_train = True):
+    dataset = data.TensorDataset(*data_arrays)
+    return data.DataLoader(dataset, batch_size, shuffle = is_train)
+data_iter = load_array((features, labels), batch_size)
+next(iter(data_iter))
 
