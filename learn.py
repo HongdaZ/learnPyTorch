@@ -165,10 +165,8 @@ def sgd(params, lr, batch_size):
             param -= lr * param.grad / batch_size
             param.grad.zero_()
 
-"""Python's behavior regarding function arguments is best described as 
-"pass by object reference." This mechanism combines aspects of both pass
- by value and pass by reference, depending on the mutability of the object
-  being passed."""
+"""Mutable values can change in plance while immutable values refer to
+another object after assignment."""
 def modify_list(my_list):
     my_list.append(4)  # Modifies the original list
     my_list = [5, 6, 7] # Reassigns the parameter, does not affect the original
@@ -191,7 +189,7 @@ for epoch in range(num_epochs):
         sgd([w, b], lr, batch_size)
     with torch.no_grad():
         train_l = loss(net(features, w, b), labels)
-        print(f'epoch{epoch + 1}, loss = { float(train_l.mean()):f}')
+        print(f'epoch{epoch + 1}, loss = {float(train_l.mean()):f}')
 
 
 import numpy as np
@@ -200,6 +198,19 @@ from torch.utils import data
 true_w = torch.tensor([2, -3.4])
 true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
+##
+def add(x, y, z):
+    return x + y + z
+
+numbers = [1, 2, 3]
+result = add(*numbers) # Equivalent to add(1, 2, 3)
+print(result) # Output: 6
+##
+def my_function(*args):
+    for arg in args:
+        print(arg)
+
+my_function(1, 2, 3, "hello") # Output: 1, 2, 3, hello
 
 def load_array(data_arrays, batch_size, is_train = True):
     dataset = data.TensorDataset(*data_arrays)
@@ -207,3 +218,5 @@ def load_array(data_arrays, batch_size, is_train = True):
 data_iter = load_array((features, labels), batch_size)
 next(iter(data_iter))
 
+from torch import nn
+net = nn.Sequential(nn.Linear(2, 1))
