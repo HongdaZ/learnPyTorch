@@ -224,7 +224,7 @@ net = nn.Sequential(nn.Linear(2, 1))
 net[0].weight.data.normal_(0, 0.01)
 net[0].bias.data.fill_(0)
 loss = nn.MSELoss()
-trainer = torch.optim.SGD(net.parameters(), lr = 0.03)
+trainer = torch.optim.SGD(net.parameters(), lr = 0.02)
 
 num_epochs = 3
 for epoch in range(num_epochs):
@@ -237,3 +237,96 @@ for epoch in range(num_epochs):
         l = loss(net(X), y)
         print(f'epoch {epoch + 1}, loss {l: f}')
 
+w = net[0].weight.data
+print('w的估计误差：', true_w - w.reshape(true_w.shape))
+b = net[0].bias.data
+print('b的估计误差：', true_b - b)
+
+import torch
+import torchvision
+from torch.utils import data
+from torchvision import transforms
+
+trans = transforms.ToTensor()
+mnist_train = torchvision.datasets.FashionMNIST(
+    root = "../data", train = True, transform = trans, download = True)
+mnist_test = torchvision.datasets.FashionMNIST(
+    root = "../data", train = False, transform = trans, download = True)
+
+len(mnist_train)
+len(mnist_test)
+
+mnist_train[0][0].shape
+
+def get_fashion_mnist_labels(labels):
+    text_labels = ["t-shirt", "trouser", "pullover", "dress", "coat", "sandal",
+                   "shirt", "sneaker", "bag", "ankle boot"]
+    return [text_labels[int(i)] for i in labels]
+
+def show_images(imgs, num_rows, num_cols, titles = None, scale = 1.5):
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = plt.subplots(num_rows, num_cols, figsize = figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        if torch.is_tensor(img):
+            ax.imshow(img.numpy())
+        else:
+            ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
+
+X, y = next(iter(data.DataLoader(mnist_train, batch_size = 18)))
+show_images(X.reshape(18, 28, 28), 2, 9,
+            titles = get_fashion_mnist_labels(y))
+plt.show(block = True)
+batch_size = 256
+def get_dataloader_worker():
+    return 4
+train_iter = data.DataLoader(mnist_train, batch_size, shuffle = True,
+                             num_workers = get_dataloader_worker())
+timer = Timer()
+for X, y in train_iter:
+    continue
+f"{timer.stop() : .2f} sec"
+
+def load_data_fashion_mnist(batch_size, resize = None):
+    trans = [transforms.ToTensor()]
+    if resize:
+        trans.insert(0, transforms.Resize(resize))
+    trans = transforms.Compose(trans)
+    mnist_train = torchvision.datasets.FashionMNIST(
+        root="../data", train = True, transform = trans, download = False)
+    mnist_test = torchvision.datasets.FashionMNIST(
+        root="../data", train = False, transform = trans, download = True)
+    return (data.DataLoader(mnist_train, batch_size, shuffle = True,
+                            num_workers = get_dataloader_worker()),
+            data.DataLoader(mnist_test, batch_size, shuffle = True,
+                            num_workers = get_dataloader_worker()))
+
+train_iter, test_iter = load_data_fashion_mnist(32, resize = 64)
+for X, y in train_iter:
+    print(X.shape, X.dtype, y.shape, y.dtype)
+    break
+
+import torch
+from IPython import display
+batch_size = 256
+train_iter, test_iter = load_data_fashion_mnist(batch_size)
+
+num_inputs = 28 * 28
+num_outputs = 10
+w = torch.normal(0, 0.01, size = (num_inputs, num_outputs),
+                 requires_grad = True)
+b = torch.zeros(num_outputs, requires_grad = True)
+w = torch.zeros(num_outputs, requires_grad = True)
+def  softmax(X):
+    X_exp = torch.exp(X)
+    partition = X_exp.sum(1, keepdim = True)
+    return X_exp / partition
+
+X = torch.normal(0, 1, (2, 5))
+X_prob = softmax(X)
+X_prob, X_prob.sum(1)
