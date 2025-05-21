@@ -524,5 +524,63 @@ net.apply(init_weights)
 loss = nn.CrossEntropyLoss(reduction = "none")
 trainer = torch.optim.SGD(net.parameters(), lr = .1)
 
-num_epochs = 10
+num_epochs = 20
 train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+
+x = torch.arange(-8.0, 8.0, 0.1, requires_grad = True)
+y = torch.relu(x)
+
+plot(x.detach(), y.detach(), "x", "relu(x)", figsize = (5, 2.5))
+
+y.backward(torch.ones_like(x), retain_graph = True)
+plot(x.detach(), x.grad, "x", "grad of relu", figsize = (5, 2.5))
+
+x.grad.zero_()
+y = torch.relu(x)
+y.sum().backward()
+plot(x.detach(), x.grad, "x", "grad of relu", figsize = (5, 2.5))
+
+y = torch.sigmoid(x)
+plot(x.detach(), y.detach(), "x", "sigmoid(x)",
+     figsize = (5, 2.5))
+
+x.grad.zero_()
+y.backward(torch.ones_like(x), retain_graph = True)
+plot(x.detach(), x.grad, "x", "grad of sigmoid(x)",
+     figsize = (5, 2.5))
+
+y = torch.tanh(x)
+plot(x.detach(), y.detach(),"x", "tanh(x)", figsize = (5, 2.5))
+
+x.grad.zero_()
+y.backward(torch.ones_like(x))
+plot(x.detach(), x.grad, "x", "grad of tanh(x)",
+     figsize = (5, 2.5))
+
+batch_size = 256
+train_iter, test_iter = load_data_fashion_mnist(batch_size)
+num_inputs, num_outputs, num_hiddens = 784, 10, 256
+
+W1 = nn.Parameter(torch.randn(num_inputs,
+                              num_hiddens, requires_grad = True) * .01)
+b1 = nn.Parameter(torch.zeros(num_hiddens, requires_grad = True))
+W2 = nn.Parameter(torch.randn(
+    num_hiddens, num_outputs, requires_grad = True) * .01)
+b2 = nn.Parameter(torch.zeros(num_outputs, requires_grad = True))
+params = [W1, b1, W2, b2]
+
+def relu(X):
+    a = torch.zeros_like(X)
+    return torch.max(X, a)
+
+def net(X):
+    X = X.reshape(-1, num_inputs)
+    H = relu(X @ W1 + b1)
+    return H @ W2 + b2
+loss = nn.CrossEntropyLoss(reduction = "none")
+
+num_epochs, lr = 10, .1
+updater = torch.optim.SGD(params, lr = lr)
+train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
+
+predict_ch3(net, test_iter)
