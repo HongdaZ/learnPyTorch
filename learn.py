@@ -1,6 +1,8 @@
 import random
 
 import torch
+from mpmath import arange
+
 torch.cuda.is_available()
 # autograd
 x = torch.arange(4.0)
@@ -439,8 +441,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     for x, y, fmt in zip(X, Y, fmts):
         axes.plot(x,y,fmt) if len(x) else axes.plot(y,fmt)
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
-
-
+import time
 # Incrementally plot multiple lines
 class Animator:  #@save
     """For plotting data in animation."""
@@ -479,8 +480,14 @@ class Animator:  #@save
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
             self.axes[0].plot(x, y, fmt)
         self.config_axes()
-        display.display(self.fig)
-        display.clear_output(wait=True)
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+        time.sleep(0.2)
+animator = Animator()
+animator.add(1, 2)
+animator.add(3, 4)
+for i in range(10):
+    animator.add(i, i ** 2)
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     animator = Animator(xlabel = "epoch", xlim = [1, num_epochs],
                         ylim = [.3, .9], legend = ["train loss", "train acc", "test acc"])
@@ -762,3 +769,27 @@ train_iter, test_iter = load_data_fashion_mnist(batch_size)
 trainer = torch.optim.SGD(net.parameters(), lr = lr)
 
 train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+
+net = nn.Sequential(nn.Flatten(),
+                    nn.Linear(784, 256),
+                    nn.ReLU(),
+                    nn.Dropout(dropout1),
+                    nn.Linear(256, 256),
+                    nn.ReLU(),
+                    nn.Dropout(dropout2),
+                    nn.Linear(256, 10))
+
+def init_weights(m):
+    if type(m) == nn.Linear:
+        nn.init.normal_(m.weight, std = .01)
+net.apply(init_weights)
+
+trainer = torch.optim.SGD(net.parameters(), lr = lr)
+train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+
+x = torch.arange(-8.0, 8.0, .1, requires_grad = True)
+y = torch.sigmoid(x)
+y.backward(torch.ones_like(x))
+
+plot(x.detach().numpy(), [y.detach().numpy(), x.grad.numpy()],
+     legend = ["sigmoid", "gradient"], figsize = (4.5, 2.5))
