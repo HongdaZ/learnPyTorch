@@ -1,5 +1,7 @@
 import torch
 from torch import nn
+
+
 import torchvision
 from torch.utils import data
 from torchvision import transforms
@@ -125,144 +127,6 @@ class Accumulator:
         self.data = [0.0] * len(self.data)
     def  __getitem__(self, idx):
         return self.data[idx]
-
-X = torch.tensor([[.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.1]])
-K = torch.tensor([[0.0, 1.0], [2.0, 3.0]])
-corr2d(X, K)
-
-class Conv2D(nn.Module):
-    def __init__(self, kernel_size):
-        super().__init__()
-        self.weight = nn.Parameter(torch.rand(kernel_size))
-        self.bias = nn.Parameter(torch.zeros(1))
-    def forward(self, x):
-        return corr2d(x, self.weight) + self.bias
-
-X = torch.ones((6, 8))
-X[:, 2 : 6] = 0
-X
-
-K = torch.tensor([[1.0, -1.0]])
-Y = corr2d(X, K)
-Y
-
-corr2d(X.t(), K)
-
-conv2d = nn.Conv2d(1, 1,
-                   kernel_size = (1, 2), bias = False)
-X = X.reshape((1, 1, 6, 8))
-Y = Y.reshape((1, 1, 6, 7))
-lr = 3e-2
-
-for i in range(10):
-    Y_hat = conv2d(X)
-    l = (Y_hat - Y) ** 2
-    conv2d.zero_grad()
-    l.sum().backward()
-    conv2d.weight.data[:] -= lr * conv2d.weight.grad
-    if (i + 1) % 2 == 0:
-        print(f"epoch {i + 1}, loss {l.sum(): .3f}")
-
-conv2d.weight.data.reshape((1, 2))
-
-def comp_conv2d(conv2d, X):
-    X = X.reshape((1, 1) + X.shape)
-    Y = conv2d(X)
-    return Y.reshape(Y.shape[2 : ])
-
-conv2d = nn.Conv2d(1, 1, kernel_size = 3, padding = 1)
-X = torch.rand(size = (8, 8))
-comp_conv2d(conv2d, X).shape
-
-conv2d = nn.Conv2d(1, 1, kernel_size = (5, 3), padding = (2, 1))
-comp_conv2d(conv2d, X).shape
-
-conv2d = nn.Conv2d(1, 1, kernel_size = 3, padding = 1, stride = 2)
-comp_conv2d(conv2d, X).shape
-
-conv2d = nn.Conv2d(1, 1, kernel_size = (3, 5),
-                   padding = (0, 1), stride = (3, 4))
-comp_conv2d(conv2d, X).shape
-
-def corr2d_multi_in(X, K):
-    return sum(corr2d(x, k) for x, k in zip(X, K))
-X = torch.tensor([[[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]],
-               [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]])
-K = torch.tensor([[[0.0, 1.0], [2.0, 3.0]], [[1.0, 2.0], [3.0, 4.0]]])
-
-corr2d_multi_in(X, K)
-
-def corr2d_multi_in_out(X, K):
-    return torch.stack([corr2d_multi_in(X, k) for k in K], 0)
-
-K = torch.stack((K, K + 1, K + 2), 0)
-K.shape
-
-corr2d_multi_in_out(X, K)
-
-def corr2d_multi_in_out_1x1(X, K):
-    c_i, h, w = X.shape
-    c_0 = K.shape[0]
-    X = X.reshape((c_i, h * w))
-    K = K.reshape((c_0, c_i))
-    Y = torch.matmul(K, X)
-    return Y.reshape((c_0, h, w))
-
-X = torch.normal(0, 1, (3, 3, 3))
-K = torch.normal(0, 1, (2, 3, 1, 1))
-Y1 = corr2d_multi_in_out_1x1(X, K)
-Y2 = corr2d_multi_in_out(X, K)
-assert float(torch.abs(Y1 - Y2).sum()) < 1e-6
-
-def pool2d(X, pool_size, mode = "max"):
-    p_h, p_w = pool_size
-    Y = torch.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w + 1))
-    for i in range(Y.shape[0]):
-        for j in range(Y.shape[1]):
-            if mode == "max":
-                Y[i, j] = X[i : i + p_h, j : j + p_w].max()
-            elif mode == "avg":
-                Y[i, j] = X[i : i + p_h, j : j + p_w].mean()
-    return Y
-
-X = torch.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
-pool2d(X, (2, 2))
-pool2d(X, (2, 2), "avg")
-X = torch.arange(16, dtype = torch.float32).reshape((1, 1, 4, 4))
-pool2d = nn.MaxPool2d(3)
-pool2d(X)
-
-pool2d = nn.MaxPool2d(3, padding = 1, stride = 2)
-pool2d(X)
-
-X = torch.cat((X, X + 1), 1)
-X
-pool2d = nn.MaxPool2d(3, padding = 1, stride = 2)
-pool2d(X)
-
-net  = nn.Sequential(
-    nn.Conv2d(1, 6, kernel_size = 5, padding = 2),
-    nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size = 2, stride = 2),
-    nn.Conv2d(6, 16, kernel_size = 5),
-    nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size = 2, stride = 2),
-    nn.Flatten(),
-    nn.Linear(16 * 5 * 5, 120),
-    nn.Sigmoid(),
-    nn.Linear(120, 84),
-    nn.Sigmoid(),
-    nn.Linear(84, 10)
-)
-
-X = torch.rand(size = (1, 1, 28, 28), dtype = torch.float32)
-for layer in net:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape: \t',X.shape)
-
-batch_size = 256
-train_iter, test_iter = load_data_fashion_mnist(batch_size = batch_size)
-
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     """使用GPU计算模型在数据集上的精度"""
     if isinstance(net, nn.Module):
@@ -281,7 +145,6 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
             y = y.to(device)
             metric.add(accuracy(net(X), y), y.numel())
     return metric[0] / metric[1]
-
 def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
     """用GPU训练模型(在第六章定义)"""
     def init_weights(m):
@@ -322,5 +185,36 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
 
-    lr, num_epochs = 0.9, 10
-    train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())
+net = nn.Sequential(
+    nn.Conv2d(1, 96, kernel_size = 11, stride = 4, padding = 1),
+    nn.ReLU(),
+    nn.MaxPool2d(kernel_size = 3, stride = 2),
+    nn.Conv2d(96, 256, kernel_size = 5, padding = 2),
+    nn.ReLU(),
+    nn.MaxPool2d(kernel_size = 3, stride = 2),
+    nn.Conv2d(256, 384, kernel_size = 3, padding = 1),
+    nn.ReLU(),
+    nn.Conv2d(384, 384, kernel_size = 3, padding = 1),
+    nn.ReLU(),
+    nn.Conv2d(384, 256, kernel_size = 3, padding = 1),
+    nn.ReLU(),
+    nn.MaxPool2d(kernel_size = 3, stride = 2),
+    nn.Flatten(),
+    nn.Linear(6400, 4096),
+    nn.ReLU(),
+    nn.Dropout(p = .5),
+    nn.Linear(4096, 4096),
+    nn.ReLU(),
+    nn.Dropout(p = .5),
+    nn.Linear(4096, 10)
+)
+X = torch.randn(1, 1, 224, 224)
+for layer in net:
+    X = layer(X)
+    print(layer.__class__.__name__, "out shape:\t", X.shape)
+
+batch_size = 128
+train_iter, test_iter = load_data_fashion_mnist(batch_size, resize = 224)
+
+lr, num_epochs = .01, 10
+train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())
