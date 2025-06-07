@@ -167,4 +167,60 @@ for layer in net:
 
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = load_data_fashion_mnist(batch_size, resize=96)
+# train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())
+
+
+class A:
+    def age(self):
+        print("Age is 21")
+
+
+class B:
+    def age(self):
+        print("Age is 23")
+
+
+class C(A, B):
+    def age(self):
+        super(C, self).age()
+
+
+class D(A, B):
+    def age(self):
+        super(A, self).age()
+
+
+c = C()
+d = D()
+c.age()
+d.age()
+
+print(C.__mro__)
+print(D.mro())
+
+from d2l import BatchNorm
+net = nn.Sequential(
+    nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4), nn.Sigmoid(),
+    nn.AvgPool2d(kernel_size=2, stride=2),
+    nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4), nn.Sigmoid(),
+    nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
+    nn.Linear(16*4*4, 120), BatchNorm(120, num_dims=2), nn.Sigmoid(),
+    nn.Linear(120, 84), BatchNorm(84, num_dims=2), nn.Sigmoid(),
+    nn.Linear(84, 10))
+
+lr, num_epochs, batch_size = 1.0, 10, 256
+train_iter, test_iter = load_data_fashion_mnist(batch_size)
+train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())
+
+net[1].gamma.reshape((-1, )), net[1].beta.reshape(-1,)
+
+net = nn.Sequential(
+    nn.Conv2d(1, 6, kernel_size = 5), nn.BatchNorm2d(6), nn.Sigmoid(),
+    nn.AvgPool2d(kernel_size = 2, stride = 2),
+    nn.Conv2d(6, 16, kernel_size = 5), nn.BatchNorm2d(16), nn.Sigmoid(),
+    nn.AvgPool2d(kernel_size = 2, stride = 2), nn.Flatten(),
+    nn.Linear(256, 120), nn.BatchNorm1d(120), nn.Sigmoid(),
+    nn.Linear(120, 84), nn.BatchNorm1d(84), nn.Sigmoid(),
+    nn.Linear(84, 10))
+
 train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())
