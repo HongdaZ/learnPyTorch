@@ -210,7 +210,7 @@ net = nn.Sequential(
 
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = load_data_fashion_mnist(batch_size)
-train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())
+# train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())
 
 net[1].gamma.reshape((-1, )), net[1].beta.reshape(-1,)
 
@@ -223,4 +223,72 @@ net = nn.Sequential(
     nn.Linear(120, 84), nn.BatchNorm1d(84), nn.Sigmoid(),
     nn.Linear(84, 10))
 
+# train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())
+
+from d2l import Residual
+
+blk = Residual(3, 3)
+X = torch.rand(4, 3, 6, 6)
+Y = blk(X)
+Y.shape
+
+blk = Residual(3, 6, use_1x1conv = True,
+               strides = 2)
+blk(X).shape
+
+b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size = 7, stride = 2,
+                             padding =3),
+                   nn.BatchNorm2d(64), nn.ReLU(),
+                   nn.MaxPool2d(kernel_size = 3, stride = 2, padding = 1))
+from d2l import resnet_block
+b2 = nn.Sequential(*resnet_block(64, 64, 2, first_block = True))
+b3 = nn.Sequential(*resnet_block(64, 128, 2))
+b4 = nn.Sequential(*resnet_block(128, 256, 2))
+b5 = nn.Sequential(*resnet_block(256, 512, 2))
+
+net = nn.Sequential(b1, b2, b3, b4, b5, nn.AdaptiveAvgPool2d((1, 1)),
+                    nn.Flatten(), nn.Linear(512, 10))
+X = torch.rand(size = (1, 1, 224, 224))
+for layer in net:
+    X = layer(X)
+    print(layer.__class__.__name__, "output shape:\t", X.shape)
+
+lr, num_epochs, batch_size = 0.05, 10, 256
+train_iter, test_iter = load_data_fashion_mnist(batch_size, resize=96)
+# train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())
+
+from d2l import conv_block, DenseBlock, transition_block
+blk = DenseBlock(2, 3, 10)
+X = torch.randn(4, 3, 8, 8)
+Y = blk(X)
+Y.shape
+
+blk = transition_block(23, 10)
+blk(Y).shape
+
+b1 = nn.Sequential(
+    nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
+    nn.BatchNorm2d(64), nn.ReLU(),
+    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+
+num_channels, growth_rate = 64, 32
+num_convs_in_dense_blocks = [4, 4, 4, 4]
+blks = []
+for i, num_convs in enumerate(num_convs_in_dense_blocks):
+    blks.append(DenseBlock(num_convs, num_channels, growth_rate))
+    # 上一个稠密块的输出通道数
+    num_channels += num_convs * growth_rate
+    # 在稠密块之间添加一个转换层，使通道数量减半
+    if i != len(num_convs_in_dense_blocks) - 1:
+        blks.append(transition_block(num_channels, num_channels // 2))
+        num_channels = num_channels // 2
+net = nn.Sequential(
+    b1, *blks,
+    nn.BatchNorm2d(num_channels), nn.ReLU(),
+    nn.AdaptiveAvgPool2d((1, 1)),
+    nn.Flatten(),
+    nn.Linear(num_channels, 10))
+
+lr, num_epochs, batch_size = 0.1, 10, 256
+train_iter, test_iter = load_data_fashion_mnist(batch_size, resize=96)
 train_ch6(net, train_iter, test_iter, num_epochs, lr, try_gpu())

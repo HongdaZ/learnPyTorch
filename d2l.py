@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-
+from torch.nn import functional as F
 
 import torchvision
 from torch.utils import data
@@ -224,3 +224,62 @@ class BatchNorm(nn.Module):
             X, self.gamma, self.beta, self.moving_mean,
             self.moving_var, eps = 1e-5, momentum = .9)
         return Y
+
+class Residual(nn.Module):
+    def __init__(self, input_channels, num_channels,
+                 use_1x1conv = False, strides = 1):
+        super().__init__()
+        self.conv1 = nn.Conv2d(input_channels, num_channels,
+                               kernel_size = 3, padding =1, stride = strides)
+        self.conv2 = nn.Conv2d(num_channels, num_channels,
+                               kernel_size = 3, padding = 1)
+        if use_1x1conv:
+            self.conv3 = nn.Conv2d(input_channels, num_channels,
+                                   kernel_size = 1, stride = strides)
+        else:
+            self.conv3 = None
+        self.bn1 = nn.BatchNorm2d(num_channels)
+        self.bn2 = nn.BatchNorm2d(num_channels)
+
+    def forward(self, X):
+        Y = F.relu(self.bn1(self.conv1(X)))
+        Y = self.bn2(self.conv2(Y))
+        if self.conv3:
+            X = self.conv3(X)
+        Y += X
+        return F.relu(Y)
+def resnet_block(input_channels, num_channels, num_residuals,
+                 first_block = False):
+    blk = []
+    for i in range(num_residuals):
+        if i == 0 and not first_block:
+            blk.append(Residual(input_channels, num_channels,
+                                use_1x1conv = True, strides = 2))
+        else:
+            blk.append(Residual(num_channels, num_channels))
+    return blk
+def conv_block(input_channels, num_channels):
+    return nn.Sequential(
+        nn.BatchNorm2d(input_channels), nn.ReLU(),
+        nn.Conv2d(input_channels, num_channels, kernel_size=3, padding=1))
+
+class DenseBlock(nn.Module):
+    def __init__(self, num_convs, input_channels, num_channels):
+        super(DenseBlock, self).__init__()
+        layer = []
+        for i in range(num_convs):
+            layer.append(conv_block(
+                num_channels * i + input_channels, num_channels))
+        self.net = nn.Sequential(*layer)
+
+    def forward(self, X):
+        for blk in self.net:
+            Y = blk(X)
+            # 连接通道维度上每个块的输入和输出
+            X = torch.cat((X, Y), dim=1)
+        return X
+def transition_block(input_channels, num_channels):
+    return nn.Sequential(
+        nn.BatchNorm2d(input_channels), nn.ReLU(),
+        nn.Conv2d(input_channels, num_channels, kernel_size=1),
+        nn.AvgPool2d(kernel_size=2, stride=2))
